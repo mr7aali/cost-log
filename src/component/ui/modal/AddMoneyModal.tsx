@@ -6,7 +6,6 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   user: { _id: string; name: string; balance: number };
-  // onUpdate: (userId: string, newBalance: number) => void;
 }
 
 const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
@@ -40,7 +39,6 @@ const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
         throw new Error("Failed to update balance");
       }
 
-      // onUpdate(user._id, user.balance + parsedAmount);
       setAmount("");
       onClose();
     } catch {
@@ -53,9 +51,9 @@ const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-opacity-30 p-4 sm:p-6">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-sm sm:max-w-md md:max-w-lg p-5 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 text-center">
           Add Money for {user.name}
         </h2>
         <form onSubmit={handleSubmit}>
@@ -71,25 +69,25 @@ const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
               id="amount"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base p-2"
               placeholder="Enter amount"
               step="0.01"
               disabled={isSubmitting}
             />
             {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
           </div>
-          <div className="flex justify-end space-x-3">
+          <div className="flex flex-col sm:flex-row sm:justify-end sm:space-x-3 gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
               disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Adding..." : "Add Money"}
