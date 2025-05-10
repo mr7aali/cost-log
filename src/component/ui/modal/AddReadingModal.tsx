@@ -86,6 +86,7 @@ const AddReadingModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
         },
       };
       await addReadingModalRequest(postData);
+
       setValue("");
       setDate({ day: "", month: "", year: "" });
       setDatePickerValue("");

@@ -1,4 +1,5 @@
 import { getUsersInfo } from "@/api/getRequest";
+import ReadingInformation from "@/component/prepaid-bill-page/ReadingInformation";
 import UserInfoTable from "@/component/prepaid-bill-page/UserInfoTable";
 import { IUser } from "@/interface/user";
 import { FC } from "react";
@@ -33,6 +34,10 @@ const PrepaidBillPage: FC = async () => {
         ) : (
           <UserInfoTable data={userData} />
         )}
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-6 text-center mt-6">
+          Reading Info
+        </h1>
+        <ReadingInformation data={userData} />
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ export const addMoneyRequest = async (data: { id: string; amount: number }) => {
 };
 export const addReadingModalRequest = async (data: IReading) => {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/user/add_balance`,
+    `${process.env.NEXT_PUBLIC_BASE_URL}/readings/create`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -29,5 +29,6 @@ export const addReadingModalRequest = async (data: IReading) => {
   if (!response.ok) {
     throw new Error("Failed to fetch user data");
   }
+
   // revalidateTag("user-balance");
 };

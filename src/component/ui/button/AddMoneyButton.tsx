@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { IUser } from "@/interface/user";
 import AddMoneyModal from "../modal/AddMoneyModal";
-// import Modal from "../modal/AddMoneyModal";
-// import Modal from "./Modal";
 
 const AddMoneyButton = ({
   data,
@@ -13,7 +11,6 @@ const AddMoneyButton = ({
 {
   data?: IUser;
   buttonText: string;
-  // onUpdate: (userId: string, newBalance: number) => void;
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -31,7 +28,6 @@ const AddMoneyButton = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         user={{ _id: data._id, name: data.name, balance: data.balance }}
-        // onUpdate={onUpdate}
       />
     </>
   );

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { IUser } from "@/interface/user";
-// import AddMoneyModal from "../modal/AddMoneyModal";
 import AddReadingModal from "../modal/AddReadingModal";
 
 const AddReadingButton = ({
@@ -12,7 +11,6 @@ const AddReadingButton = ({
 {
   data?: IUser;
   buttonText: string;
-  // onUpdate: (userId: string, newBalance: number) => void;
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
