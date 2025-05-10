@@ -73,6 +73,8 @@ This project is licensed under the MIT License – see the LICENSE file for deta
 
 ## 👤 Author
 
+```bash
 Sheikh Sukur Ali
 GitHub: @mr7aali
 Email: mr7aali@gmail.com
+```
