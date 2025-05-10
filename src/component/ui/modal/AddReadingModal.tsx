@@ -17,6 +17,16 @@ const AddReadingModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
   const [datePickerValue, setDatePickerValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<
+    "day" | "month" | "year" | null
+  >(null);
+
+  // Generate options for dropdowns
+  const dayOptions = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
+  const monthOptions = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
+  const yearOptions = Array.from({ length: 26 }, (_, i) =>
+    (2021 + i).toString()
+  ); // 2000 to 2025
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -79,6 +89,7 @@ const AddReadingModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
       setValue("");
       setDate({ day: "", month: "", year: "" });
       setDatePickerValue("");
+      setActiveDropdown(null);
       onClose();
     } catch {
       setError("Failed to add transaction. Please try again.");
@@ -95,9 +106,19 @@ const AddReadingModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
   // Toggle between manual and date picker
   const toggleDateInput = () => {
     setUseDatePicker(!useDatePicker);
-    setError(null); // Clear any existing errors
+    setError(null);
     setDate({ day: "", month: "", year: "" });
     setDatePickerValue("");
+    setActiveDropdown(null);
+  };
+
+  // Handle dropdown selection
+  const handleDropdownSelect = (
+    field: "day" | "month" | "year",
+    value: string
+  ) => {
+    setDate({ ...date, [field]: value });
+    setActiveDropdown(null);
   };
 
   if (!isOpen) return null;
@@ -152,37 +173,90 @@ const AddReadingModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
                 max="2100-12-31"
               />
             ) : (
-              <div className="flex space-x-2 mt-1">
-                <input
-                  type="number"
-                  value={date.day}
-                  onChange={(e) => setDate({ ...date, day: e.target.value })}
-                  className="block w-1/3 rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base p-2"
-                  placeholder="Day"
-                  min="1"
-                  max="31"
-                  disabled={isSubmitting}
-                />
-                <input
-                  type="number"
-                  value={date.month}
-                  onChange={(e) => setDate({ ...date, month: e.target.value })}
-                  className="block w-1/3 rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base p-2"
-                  placeholder="Month"
-                  min="1"
-                  max="12"
-                  disabled={isSubmitting}
-                />
-                <input
-                  type="number"
-                  value={date.year}
-                  onChange={(e) => setDate({ ...date, year: e.target.value })}
-                  className="block w-1/3 rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base p-2"
-                  placeholder="Year"
-                  min="2000"
-                  max="2100"
-                  disabled={isSubmitting}
-                />
+              <div className="flex space-x-2 mt-1 relative">
+                <div className="w-1/3 relative">
+                  <input
+                    type="text"
+                    value={date.day}
+                    onFocus={() => setActiveDropdown("day")}
+                    onChange={(e) => setDate({ ...date, day: e.target.value })}
+                    className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base p-2"
+                    placeholder="Day"
+                    disabled={isSubmitting}
+                  />
+                  {activeDropdown === "day" && (
+                    <select
+                      size={5}
+                      className="absolute top-full left-0 w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-1 z-10"
+                      onChange={(e) =>
+                        handleDropdownSelect("day", e.target.value)
+                      }
+                      autoFocus
+                    >
+                      {dayOptions.map((day) => (
+                        <option key={day} value={day}>
+                          {day}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                <div className="w-1/3 relative">
+                  <input
+                    type="text"
+                    value={date.month}
+                    onFocus={() => setActiveDropdown("month")}
+                    onChange={(e) =>
+                      setDate({ ...date, month: e.target.value })
+                    }
+                    className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base p-2"
+                    placeholder="Month"
+                    disabled={isSubmitting}
+                  />
+                  {activeDropdown === "month" && (
+                    <select
+                      size={5}
+                      className="absolute top-full left-0 w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-1 z-10"
+                      onChange={(e) =>
+                        handleDropdownSelect("month", e.target.value)
+                      }
+                      autoFocus
+                    >
+                      {monthOptions.map((month) => (
+                        <option key={month} value={month}>
+                          {month}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                <div className="w-1/3 relative">
+                  <input
+                    type="text"
+                    value={date.year}
+                    onFocus={() => setActiveDropdown("year")}
+                    onChange={(e) => setDate({ ...date, year: e.target.value })}
+                    className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base p-2"
+                    placeholder="Year"
+                    disabled={isSubmitting}
+                  />
+                  {activeDropdown === "year" && (
+                    <select
+                      size={5}
+                      className="absolute top-full left-0 w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm p-1 z-10"
+                      onChange={(e) =>
+                        handleDropdownSelect("year", e.target.value)
+                      }
+                      autoFocus
+                    >
+                      {yearOptions.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
               </div>
             )}
             {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
