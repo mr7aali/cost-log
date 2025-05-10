@@ -58,7 +58,13 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
           throw new Error(`Failed to fetch readings: ${response.status}`);
         }
         const result: APIResponse = await response.json();
-        setReadings((prev) => ({ ...prev, [userId]: result.readings }));
+        // Sort readings by date
+        const sortedReadings = result.readings.sort((a, b) => {
+          const dateA = new Date(a.date.year, a.date.month - 1, a.date.day);
+          const dateB = new Date(b.date.year, b.date.month - 1, b.date.day);
+          return dateA.getTime() - dateB.getTime();
+        });
+        setReadings((prev) => ({ ...prev, [userId]: sortedReadings }));
         setActiveUsers((prev) => [...prev, userId]);
       } catch (err) {
         console.error(`Error fetching readings for user ${userId}:`, err);
@@ -117,7 +123,7 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
       .padStart(2, "0")}/${date.year}`;
   };
 
-  // Get aggregated value and unit for a specific date
+  // Calculate units and get aggregated data for a specific date
   const getDataForDate = (
     userReadings: IReading[],
     date: { day: number; month: number; year: number }
@@ -129,13 +135,31 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
         r.date.year === date.year
     );
     if (!matchingReadings.length) return "-";
-    const totalValue = matchingReadings
-      .reduce((sum, r) => sum + r.value, 0)
-      .toFixed(2);
-    const totalUnit = matchingReadings
-      .reduce((sum, r) => sum + r.unit, 0)
-      .toFixed(0);
-    return `${totalValue} TK / ${totalUnit} units`;
+
+    // Calculate units as difference from previous reading
+    const sortedReadings = [...userReadings].sort((a, b) => {
+      const dateA = new Date(a.date.year, a.date.month - 1, a.date.day);
+      const dateB = new Date(b.date.year, b.date.month - 1, b.date.day);
+      return dateA.getTime() - dateB.getTime();
+    });
+
+    let totalValue = 0;
+    let totalUnit = 0;
+
+    matchingReadings.forEach((reading) => {
+      const readingIndex = sortedReadings.findIndex(
+        (r) => r._id === reading._id
+      );
+      let calculatedUnit = 0;
+      if (readingIndex > 0) {
+        // Calculate unit as current value - previous value
+        calculatedUnit = reading.value - sortedReadings[readingIndex - 1].value;
+      } // First reading: unit = 0
+      totalValue += reading.value;
+      totalUnit += calculatedUnit;
+    });
+
+    return `${totalValue.toFixed(2)} TK / ${totalUnit.toFixed(0)} units`;
   };
 
   return (
