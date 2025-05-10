@@ -1,5 +1,6 @@
 import AddMoneyButton from "@/component/ui/button/AddMoneyButton";
 import { IUser } from "@/interface/user";
+// import { revalidateTag } from "next/cache";
 import { FC } from "react";
 
 const PrepaidBillPage: FC = async () => {
@@ -8,10 +9,14 @@ const PrepaidBillPage: FC = async () => {
 
   try {
     const url = `${process.env.NEXT_PUBLIC_BASE_URL}/user`;
-    const response = await fetch(url, { cache: "no-store" });
+    const response = await fetch(url, {
+      cache: "no-store",
+      // next: { tags: ["user-balance"] },
+    });
     if (!response.ok) {
       throw new Error("Failed to fetch user data");
     }
+    // revalidateTag("user-balance");
     userData = (await response.json()) as IUser[];
   } catch {
     error =

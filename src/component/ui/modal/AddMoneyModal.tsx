@@ -12,7 +12,6 @@ const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
   const [amount, setAmount] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -24,21 +23,25 @@ const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
       setIsSubmitting(false);
       return;
     }
-
     try {
+      const respostData = { id: user._id, amount: amount };
+      console.log(respostData);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/user/${user._id}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/user/add_balance`,
         {
-          method: "PATCH",
+          method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ balance: user.balance + parsedAmount }),
+          body: JSON.stringify(respostData),
+          // mode: "no-cors",
+          next: {
+            tags: ["user-balance"],
+          },
         }
       );
-
+      console.log(response);
       if (!response.ok) {
         throw new Error("Failed to update balance");
       }
-
       setAmount("");
       onClose();
     } catch {
