@@ -134,7 +134,7 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
         r.date.month === date.month &&
         r.date.year === date.year
     );
-    if (!matchingReadings.length) return "-";
+    if (!matchingReadings.length) return { display: "-", unit: 0 };
 
     // Calculate units as difference from previous reading
     const sortedReadings = [...userReadings].sort((a, b) => {
@@ -152,14 +152,36 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
       );
       let calculatedUnit = 0;
       if (readingIndex > 0) {
-        // Calculate unit as current value - previous value
         calculatedUnit = reading.value - sortedReadings[readingIndex - 1].value;
       } // First reading: unit = 0
       totalValue += reading.value;
       totalUnit += calculatedUnit;
     });
 
-    return `${totalValue.toFixed(2)} TK / ${totalUnit.toFixed(0)} units`;
+    return {
+      display: `${totalValue.toFixed(2)} TK / ${totalUnit.toFixed(0)} units`,
+      unit: totalUnit,
+    };
+  };
+
+  // Calculate total units for a specific date across all users
+  const getTotalUnitsForDate = (date: {
+    day: number;
+    month: number;
+    year: number;
+  }) => {
+    let totalUnits = 0;
+    let hasData = false;
+
+    activeUsers.forEach((userId) => {
+      const data = getDataForDate(readings[userId], date);
+      if (data.unit !== 0) {
+        totalUnits += data.unit;
+        hasData = true;
+      }
+    });
+
+    return hasData ? `${totalUnits.toFixed(0)} units` : "-";
   };
 
   return (
@@ -207,6 +229,9 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
                   </div>
                 </th>
               ))}
+              <th className="px-4 py-2 sm:px-6 sm:py-3 font-semibold">
+                Total Units
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 text-sm text-center">
@@ -241,13 +266,22 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
                           animate={{ opacity: 1 }}
                           transition={{ duration: 0.3 }}
                         >
-                          {getDataForDate(readings[item._id], date)}
+                          {getDataForDate(readings[item._id], date).display}
                         </motion.span>
                       ) : (
                         "-"
                       )}
                     </td>
                   ))}
+                  <td className="px-4 py-3 sm:px-6 whitespace-nowrap text-gray-900 font-medium">
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {getTotalUnitsForDate(date)}
+                    </motion.span>
+                  </td>
                 </motion.tr>
               ))}
             </AnimatePresence>
