@@ -87,11 +87,49 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
     fetchAllReadings();
   }, [data, fetchReadings, readings]);
 
-  // Get the maximum number of readings for any active user to align rows
-  const maxReadings = Math.max(
-    ...activeUsers.map((userId) => readings[userId]?.length || 0),
-    1 // Ensure at least one row
-  );
+  // Collect all unique dates and sort them chronologically
+  const uniqueDates = Array.from(
+    new Set(
+      activeUsers
+        .flatMap((userId) =>
+          readings[userId]?.map(
+            (reading) =>
+              `${reading.date.year}-${reading.date.month
+                .toString()
+                .padStart(2, "0")}-${reading.date.day
+                .toString()
+                .padStart(2, "0")}`
+          )
+        )
+        .filter(Boolean)
+    )
+  )
+    .sort()
+    .map((dateStr) => {
+      const [year, month, day] = dateStr.split("-").map(Number);
+      return { day, month, year };
+    });
+
+  // Format date as DD/MM/YYYY
+  const formatDate = (date: { day: number; month: number; year: number }) => {
+    return `${date.day.toString().padStart(2, "0")}/${date.month
+      .toString()
+      .padStart(2, "0")}/${date.year}`;
+  };
+
+  // Check if a reading matches a specific date
+  const getValueForDate = (
+    userReadings: IReading[],
+    date: { day: number; month: number; year: number }
+  ) => {
+    const reading = userReadings.find(
+      (r) =>
+        r.date.day === date.day &&
+        r.date.month === date.month &&
+        r.date.year === date.year
+    );
+    return reading ? reading.value.toFixed(2) : "-";
+  };
 
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden">
@@ -100,7 +138,7 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
           <thead className="bg-gray-50 text-xs sm:text-sm text-gray-500 uppercase tracking-wider">
             <tr className="text-center">
               <th className="px-4 py-2 sm:px-6 sm:py-3 sticky left-0 bg-gray-50 font-semibold">
-                Reading
+                Date
               </th>
               {data.map((item) => (
                 <th
@@ -142,9 +180,9 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 text-sm text-center">
             <AnimatePresence>
-              {Array.from({ length: maxReadings }).map((_, rowIndex) => (
+              {uniqueDates.map((date, rowIndex) => (
                 <motion.tr
-                  key={rowIndex}
+                  key={`${date.year}-${date.month}-${date.day}`}
                   className="hover:bg-gray-50 transition-colors duration-200"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -152,7 +190,13 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
                   transition={{ duration: 0.2 }}
                 >
                   <td className="px-4 py-3 sm:px-6 whitespace-nowrap font-medium text-gray-900 sticky left-0 bg-white">
-                    Reading {rowIndex + 1} (TK)
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {formatDate(date)}
+                    </motion.span>
                   </td>
                   {data.map((item) => (
                     <td
@@ -160,13 +204,13 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
                       className="px-4 py-3 sm:px-6 whitespace-nowrap text-gray-500"
                     >
                       {activeUsers.includes(item._id) &&
-                      readings[item._id]?.[rowIndex] ? (
+                      readings[item._id]?.length ? (
                         <motion.span
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ duration: 0.3 }}
                         >
-                          {readings[item._id][rowIndex].value.toFixed(2)}
+                          {getValueForDate(readings[item._id], date)}
                         </motion.span>
                       ) : (
                         "-"
