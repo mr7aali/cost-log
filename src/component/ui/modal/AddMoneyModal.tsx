@@ -1,5 +1,6 @@
 "use client";
 
+import { addMoneyRequest } from "@/api/postRequest";
 import { FC, useState, FormEvent } from "react";
 
 interface ModalProps {
@@ -25,23 +26,10 @@ const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
     }
     try {
       const respostData = { id: user._id, amount: amount };
-      console.log(respostData);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/user/add_balance`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(respostData),
-          // mode: "no-cors",
-          next: {
-            tags: ["user-balance"],
-          },
-        }
-      );
-      console.log(response);
-      if (!response.ok) {
-        throw new Error("Failed to update balance");
-      }
+      await addMoneyRequest({
+        amount: Number(respostData.amount),
+        id: respostData.id,
+      });
       setAmount("");
       onClose();
     } catch {
