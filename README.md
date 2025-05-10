@@ -13,7 +13,7 @@ Built with:
 ## 🔗 Backend Repository
 
 The backend for **CostLog** is available at:  
-<a href="https://github.com/your-username/cost-log-backend" target="_blank">Backend Repository</a>
+<a href="https://github.com/mr7aali/nest-js-project.git" target="_blank">Backend Repository</a>
 
 ## 🚀 Features
 
