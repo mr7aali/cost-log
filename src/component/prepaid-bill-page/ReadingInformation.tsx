@@ -117,18 +117,25 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
       .padStart(2, "0")}/${date.year}`;
   };
 
-  // Check if a reading matches a specific date
-  const getValueForDate = (
+  // Get aggregated value and unit for a specific date
+  const getDataForDate = (
     userReadings: IReading[],
     date: { day: number; month: number; year: number }
   ) => {
-    const reading = userReadings.find(
+    const matchingReadings = userReadings.filter(
       (r) =>
         r.date.day === date.day &&
         r.date.month === date.month &&
         r.date.year === date.year
     );
-    return reading ? reading.value.toFixed(2) : "-";
+    if (!matchingReadings.length) return "-";
+    const totalValue = matchingReadings
+      .reduce((sum, r) => sum + r.value, 0)
+      .toFixed(2);
+    const totalUnit = matchingReadings
+      .reduce((sum, r) => sum + r.unit, 0)
+      .toFixed(0);
+    return `${totalValue} TK / ${totalUnit} units`;
   };
 
   return (
@@ -200,7 +207,7 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
                   </td>
                   {data.map((item) => (
                     <td
-                      key={`${item._id}-value-${rowIndex}`}
+                      key={`${item._id}-data-${rowIndex}`}
                       className="px-4 py-3 sm:px-6 whitespace-nowrap text-gray-500"
                     >
                       {activeUsers.includes(item._id) &&
@@ -210,7 +217,7 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
                           animate={{ opacity: 1 }}
                           transition={{ duration: 0.3 }}
                         >
-                          {getValueForDate(readings[item._id], date)}
+                          {getDataForDate(readings[item._id], date)}
                         </motion.span>
                       ) : (
                         "-"
