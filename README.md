@@ -10,6 +10,11 @@ Built with:
 
 ---
 
+## 🔗 Backend Repository
+
+The backend for **CostLog** is available at:  
+[Backend Repository](https://github.com/mr7aali/nest-js-project.git)
+
 ## 🚀 Features
 
 - ✅ Add, edit, and delete expenses
@@ -38,7 +43,7 @@ Built with:
 
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/your-username/cost-log.git
+   git clone https://github.com/mr7aali/cost-log.git
    cd cost-log
    ```
 
