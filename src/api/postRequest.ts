@@ -25,6 +25,7 @@ export const addReadingModalRequest = async (data: IReading) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
+      next: { tags: ["reading"] },
     }
   );
   if (!response.ok) {
@@ -34,10 +35,6 @@ export const addReadingModalRequest = async (data: IReading) => {
   // revalidateTag("user-balance");
 };
 
-// r_id: rId,
-// user_id: user._id,
-// amount: amount,
-// u_id: user.u_id,
 export const createPayment = async (data: IPaymentAddResquestBody) => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/payment/create`,

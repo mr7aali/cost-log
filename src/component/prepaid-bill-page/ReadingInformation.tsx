@@ -3,25 +3,27 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { IUser } from "@/interface/user";
 import { motion, AnimatePresence } from "framer-motion";
+import { getReadingByUserID } from "@/api/getRequest";
+import { IReading } from "@/interface/reading";
 
-interface IReading {
-  _id: string;
-  r_id: number;
-  user_id: string;
-  value: number;
-  u_id: number;
-  unit: number;
-  date: { day: number; month: number; year: number };
-  createdAt: string;
-  updatedAt: string;
-  prepaidAmmount: number;
-  __v: number;
-}
+// interface IReading {
+//   _id: string;
+//   r_id: number;
+//   user_id: string;
+//   value: number;
+//   u_id: number;
+//   unit: number;
+//   date: { day: number; month: number; year: number };
+//   createdAt: string;
+//   updatedAt: string;
+//   prepaidAmmount: number;
+//   __v: number;
+// }
 
-interface APIResponse {
-  userInfo: IUser;
-  readings: IReading[];
-}
+// interface APIResponse {
+//   userInfo: IUser;
+//   readings: IReading[];
+// }
 
 const ReadingInformation = ({ data }: { data: IUser[] }) => {
   const [readings, setReadings] = useState<{ [key: string]: IReading[] }>({});
@@ -52,13 +54,14 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
       setError(null);
 
       try {
-        const response = await fetch(
-          `http://localhost:5000/readings/get/${userId}`
-        );
-        if (!response.ok) {
-          throw new Error(`Failed to fetch readings: ${response.status}`);
-        }
-        const result: APIResponse = await response.json();
+        // const response = await fetch(
+        //   `http://localhost:5000/readings/get/${userId}`
+        // );
+        const result = await getReadingByUserID(userId);
+        // if (!response.ok) {
+        //   throw new Error(`Failed to fetch readings: ${response.status}`);
+        // }
+        // const result: APIResponse = await response.json();
         // Sort readings by date
         const sortedReadings = result.readings.sort((a, b) => {
           const dateA = new Date(a.date.year, a.date.month - 1, a.date.day);
