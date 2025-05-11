@@ -1,7 +1,8 @@
 "use client";
 
+import { getReading } from "@/api/getRequest";
 // import { addMoneyRequest } from "@/api/postRequest";
-import { FC, useState, FormEvent } from "react";
+import { FC, useState, FormEvent, useEffect } from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -16,6 +17,19 @@ const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Sample r_id options; replace with your actual options if needed
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await getReading();
+        console.log(result);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
   const rIdOptions = [
     { value: "1", label: "Option 1" },
     { value: "2", label: "Option 2" },
