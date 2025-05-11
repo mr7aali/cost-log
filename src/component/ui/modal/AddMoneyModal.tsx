@@ -1,18 +1,27 @@
 "use client";
 
-import { addMoneyRequest } from "@/api/postRequest";
+// import { addMoneyRequest } from "@/api/postRequest";
 import { FC, useState, FormEvent } from "react";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: { _id: string; name: string; balance: number };
+  user: { _id: string; name: string; balance: number; u_id: number };
 }
 
 const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
   const [amount, setAmount] = useState("");
+  const [rId, setRId] = useState("1"); // Default r_id value
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sample r_id options; replace with your actual options if needed
+  const rIdOptions = [
+    { value: "1", label: "Option 1" },
+    { value: "2", label: "Option 2" },
+    { value: "3", label: "Option 3" },
+  ];
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -24,13 +33,28 @@ const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
       setIsSubmitting(false);
       return;
     }
+
     try {
-      const respostData = { id: user._id, amount: amount };
-      await addMoneyRequest({
-        amount: Number(respostData.amount),
-        id: respostData.id,
-      });
+      const respostData = {
+        r_id: rId,
+        user_id: user._id,
+        amount: amount,
+        u_id: user.u_id,
+      };
+      console.log(respostData);
+      // {
+      //   "r_id":1,
+      //   "user_id":"681e4b1ffbf94af791315feb",
+      //   "ammount":1000,
+      //   "u_id":1
+      // }
+      // await addMoneyRequest({
+      //   amount: Number(respostData.amount),
+      //   id: respostData.id,
+      //   r_id: Number(respostData.r_id),
+      // });
       setAmount("");
+      setRId("1"); // Reset to default
       onClose();
     } catch {
       setError("Failed to update balance. Please try again.");
@@ -48,6 +72,27 @@ const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
           Add Money for {user.name}
         </h2>
         <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label
+              htmlFor="r_id"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Request ID
+            </label>
+            <select
+              id="r_id"
+              value={rId}
+              onChange={(e) => setRId(e.target.value)}
+              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base p-2"
+              disabled={isSubmitting}
+            >
+              {rIdOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="mb-4">
             <label
               htmlFor="amount"

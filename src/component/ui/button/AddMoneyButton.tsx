@@ -27,7 +27,12 @@ const AddMoneyButton = ({
       <AddMoneyModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        user={{ _id: data._id, name: data.name, balance: data.balance }}
+        user={{
+          _id: data._id,
+          name: data.name,
+          balance: data.balance,
+          u_id: data.u_id,
+        }}
       />
     </>
   );
