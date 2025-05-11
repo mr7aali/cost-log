@@ -14,6 +14,7 @@ interface IReading {
   date: { day: number; month: number; year: number };
   createdAt: string;
   updatedAt: string;
+  prepaidAmmount: number;
   __v: number;
 }
 
@@ -145,6 +146,7 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
 
     let totalValue = 0;
     let totalUnit = 0;
+    let totalPrepaid = 0;
 
     matchingReadings.forEach((reading) => {
       const readingIndex = sortedReadings.findIndex(
@@ -156,10 +158,13 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
       } // First reading: unit = 0
       totalValue += reading.value;
       totalUnit += calculatedUnit;
+      totalPrepaid += reading.prepaidAmmount;
     });
 
     return {
-      display: `${totalValue.toFixed(2)} TK / ${totalUnit.toFixed(0)} units`,
+      display: `${totalValue.toFixed(2)} TK / ${totalUnit.toFixed(
+        0
+      )} units / ${totalPrepaid.toFixed(2)} TK`,
       unit: totalUnit,
     };
   };
