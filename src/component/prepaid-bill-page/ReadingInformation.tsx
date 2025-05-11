@@ -6,25 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getReadingByUserID } from "@/api/getRequest";
 import { IReading } from "@/interface/reading";
 
-// interface IReading {
-//   _id: string;
-//   r_id: number;
-//   user_id: string;
-//   value: number;
-//   u_id: number;
-//   unit: number;
-//   date: { day: number; month: number; year: number };
-//   createdAt: string;
-//   updatedAt: string;
-//   prepaidAmmount: number;
-//   __v: number;
-// }
-
-// interface APIResponse {
-//   userInfo: IUser;
-//   readings: IReading[];
-// }
-
 const ReadingInformation = ({ data }: { data: IUser[] }) => {
   const [readings, setReadings] = useState<{ [key: string]: IReading[] }>({});
   const [activeUsers, setActiveUsers] = useState<string[]>([]);
@@ -54,14 +35,7 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
       setError(null);
 
       try {
-        // const response = await fetch(
-        //   `http://localhost:5000/readings/get/${userId}`
-        // );
         const result = await getReadingByUserID(userId);
-        // if (!response.ok) {
-        //   throw new Error(`Failed to fetch readings: ${response.status}`);
-        // }
-        // const result: APIResponse = await response.json();
         // Sort readings by date
         const sortedReadings = result.readings.sort((a, b) => {
           const dateA = new Date(a.date.year, a.date.month - 1, a.date.day);
@@ -181,12 +155,11 @@ const ReadingInformation = ({ data }: { data: IUser[] }) => {
     let totalUnits = 0;
     let hasData = false;
 
-    activeUsers.forEach((userId) => {
-      const data = getDataForDate(readings[userId], date);
-      if (data.unit !== 0) {
-        totalUnits += data.unit;
-        hasData = true;
-      }
+    data.forEach((user) => {
+      const userReadings = readings[user._id] || [];
+      const dataForDate = getDataForDate(userReadings, date);
+      totalUnits += dataForDate.unit; // Sum all units, including zeros
+      if (dataForDate.display !== "-") hasData = true;
     });
 
     return hasData ? `${totalUnits.toFixed(0)} units` : "-";
