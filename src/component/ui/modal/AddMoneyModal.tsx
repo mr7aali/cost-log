@@ -1,6 +1,9 @@
 "use client";
 
 import { getReading } from "@/api/getRequest";
+import { createPayment } from "@/api/postRequest";
+import { IReading } from "@/interface/reading";
+import { IPaymentAddResquestBody } from "@/interface/request";
 // import { addMoneyRequest } from "@/api/postRequest";
 import { FC, useState, FormEvent, useEffect } from "react";
 
@@ -10,31 +13,46 @@ interface ModalProps {
   user: { _id: string; name: string; balance: number; u_id: number };
 }
 
+interface RequestOption {
+  value: string;
+  label: string;
+  r_id: number;
+  date: { day: number; month: number; year: number };
+}
+
 const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
   const [amount, setAmount] = useState("");
   const [rId, setRId] = useState("1"); // Default r_id value
+  const [rIdOptions, setRIdOptions] = useState<RequestOption[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sample r_id options; replace with your actual options if needed
-
+  // Fetch request options
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await getReading();
-        console.log(result);
+        const result = (await getReading()) as unknown as IReading[];
+        // Map the fetched data to rIdOptions format
+        const options: RequestOption[] = result.map((item) => ({
+          value: item.r_id.toString(),
+          label: `ReadingID: ${item.r_id + 1}, Date: ${item.date.day}/${
+            item.date.month
+          }/${item.date.year}`,
+          r_id: item.r_id,
+          date: item.date,
+        }));
+        setRIdOptions(options);
+        if (options.length > 0) {
+          setRId(options[0].value); // Set first r_id as default
+        }
       } catch (error) {
         console.error(error);
+        setError("Failed to load request options.");
       }
     };
 
     fetchData();
   }, []);
-  const rIdOptions = [
-    { value: "1", label: "Option 1" },
-    { value: "2", label: "Option 2" },
-    { value: "3", label: "Option 3" },
-  ];
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -49,10 +67,10 @@ const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
     }
 
     try {
-      const respostData = {
-        r_id: rId,
+      const respostData: IPaymentAddResquestBody = {
+        r_id: Number(rId),
         user_id: user._id,
-        amount: amount,
+        ammount: Number(amount),
         u_id: user.u_id,
       };
       console.log(respostData);
@@ -62,13 +80,9 @@ const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
       //   "ammount":1000,
       //   "u_id":1
       // }
-      // await addMoneyRequest({
-      //   amount: Number(respostData.amount),
-      //   id: respostData.id,
-      //   r_id: Number(respostData.r_id),
-      // });
+      await createPayment(respostData);
       setAmount("");
-      setRId("1"); // Reset to default
+      setRId(rIdOptions.length > 0 ? rIdOptions[0].value : "1"); // Reset to first option or default
       onClose();
     } catch {
       setError("Failed to update balance. Please try again.");
@@ -100,11 +114,15 @@ const AddMoneyModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
               className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base p-2"
               disabled={isSubmitting}
             >
-              {rIdOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
+              {rIdOptions.length === 0 ? (
+                <option value="">Loading...</option>
+              ) : (
+                rIdOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))
+              )}
             </select>
           </div>
           <div className="mb-4">

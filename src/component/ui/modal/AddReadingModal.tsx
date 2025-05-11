@@ -75,7 +75,7 @@ const AddReadingModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
     }
 
     try {
-      const postData: IReading = {
+      const postData: Partial<IReading> = {
         user_id: user._id,
         value: parsedValue,
         u_id: user.u_id,
@@ -85,7 +85,7 @@ const AddReadingModal: FC<ModalProps> = ({ isOpen, onClose, user }) => {
           year: parsedYear,
         },
       };
-      await addReadingModalRequest(postData);
+      await addReadingModalRequest(postData as IReading);
 
       setValue("");
       setDate({ day: "", month: "", year: "" });
